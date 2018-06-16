@@ -196,6 +196,11 @@ def main():
 
     reload_settings()
 
+    if "wakeup_alarm" in configData:
+        if configData["wakeup_alarm"].get("Cycle_enable", False):
+            pijuice = PiJuice(1, 0x14)
+            pijuice.rtcAlarm.SetWakeupEnabled(True)
+
     try:
         for b in pijuice.config.buttons:
             conf = pijuice.config.GetButtonConfiguration(b)

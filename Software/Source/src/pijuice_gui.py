@@ -1200,7 +1200,7 @@ class PiJuiceWakeupConfig(object):
     def __init__(self, master):
         self.frame = Frame(master, name='wakeup')
         self.frame.grid(row=0, column=0, sticky=W)
-        self.frame.rowconfigure(10, weight=1)
+        self.frame.rowconfigure(11, weight=1)
         self.frame.columnconfigure((0,3), weight=1, uniform=1)
         self.frame.columnconfigure(0, minsize=100)
 
@@ -1263,6 +1263,13 @@ class PiJuiceWakeupConfig(object):
         self.status = StringVar()
         self.statusLbl = Label(self.frame, textvariable=self.status).grid(row=10, column=2, padx=(4, 2), pady=(6, 0), sticky = 'W')
 
+        self.cyclicPowerUp = BooleanVar()
+        if "wakeup_alarm" in pijuiceConfigData:
+            self.cyclicPowerUp.set(pijuiceConfigData["wakeup_alarm"].get("Cycle_enable", False))
+        self.cyclicPowerUpCheck = Checkbutton(self.frame, text = "Cyclic wakeup", variable = self.cyclicPowerUp,
+                                              command = self._SetCyclecPowerUp)
+        self.cyclicPowerUpCheck.grid(row=11, column=1, padx=(2, 2), pady=(6, 0), sticky='W')
+
         #print pijuice.rtcAlarm.SetAlarm({'second':10, 'minute':45, 'hour':'11PM', 'day':'2'})
         #print pijuice.rtcAlarm.SetAlarm({}) #disable alarm
 
@@ -1307,6 +1314,12 @@ class PiJuiceWakeupConfig(object):
         self.wakeupEnabled.trace("w", self._WakeupEnableChecked)
 
         self._RefreshTime()
+
+    def _SetCyclecPowerUp(self):
+        if "wakeup_alarm" not in pijuiceConfigData:
+            pijuiceConfigData["wakeup_alarm"] = {}
+
+        pijuiceConfigData["wakeup_alarm"]["Cycle_enable"] = self.cyclicPowerUp.get()
 
     def _RefreshTime(self):
         self.frame.after(1000, self._RefreshTime)
